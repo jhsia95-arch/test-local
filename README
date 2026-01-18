@@ -4,7 +4,9 @@
 update etc/host to 127.0.0.1 to service name api.local
 minikube tunnel
    16  choco install kubernetes-helm
-
+echo -n dbadmin
+echo -n 'V9!rQ2#Lx814124' | base64
+VjkhclEyI0x4OA==
    18  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
    19  helm repo add grafana https://grafana.github.io/helm-charts
    20  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
@@ -40,14 +42,17 @@ minikube tunnel
    84  curl -X POST "http:://api.local/items?name=test"
    85  curl -X POST "http://api.local/items?name=test"
    86  curl http://api.local/items
-   87  eval $(minikube -p minikube docker-env)    # Linux/Mac
-
-   90  docker build -t fastapi-demo:1.0 .
+eval $(minikube -p minikube docker-env)    # Linux/Mac
+docker build -t fastapi-demo:1.0 .
 
   119  curl -X POST "http://api.local/webhook" -H "Content-Type: application/json" -d '{"event":"manual_test"}'
 
   121  kubectl port-forward -n monitoring svc/kube-prom-grafana 3000:80
   122  kubectl --namespace monitoring get secrets kube-prom-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+   24  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
+   25  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+   26  helm repo update
+   27  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring   --create-namespace   --set grafana.enabled=true   --set alertmanager.enabled=true   --set prometheus.prometheusSpec.retention=2d
 
   125  helm upgrade --install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring -f helm/grafana-values.yaml
 
