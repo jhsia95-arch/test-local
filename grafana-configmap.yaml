@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-dashboards
+  labels:
+    grafana_dashboard: "1"
+data:
+  k8s-resource-usage.json: |
+    {
+      "id": null,
+      "title": "Kubernetes Resource Usage",
+      "tags": ["kubernetes", "cpu", "memory", "disk"],
+      "timezone": "browser",
+      "schemaVersion": 36,
+      "version": 1,
+      "panels": [
+        {
+          "type": "graph",
+          "title": "CPU Usage (%)",
+          "targets": [
+            {
+              "expr": "100 * (sum(rate(container_cpu_usage_seconds_total{image!=''}[5m])) by (namespace) / sum(kube_pod_container_resource_limits_cpu_cores) by (namespace))",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "type": "graph",
+          "title": "Memory Usage (%)",
+          "targets": [
+            {
+              "expr": "100 * (sum(container_memory_usage_bytes{image!=''}) by (namespace) / sum(kube_pod_container_resource_limits_memory_bytes) by (namespace))",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "type": "graph",
+          "title": "Disk Usage (%)",
+          "targets": [
+            {
+              "expr": "100 - (node_filesystem_free_bytes{fstype!~'tmpfs|overlay'} / node_filesystem_size_bytes{fstype!~'tmpfs|overlay'} * 100)",
+              "legendFormat": "{{instance}}"
+            }
+          ]
+        }
+      ]
+    }

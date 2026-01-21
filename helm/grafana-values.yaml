@@ -15,3 +15,80 @@ grafana:
     dashboards:
       enabled: true
       label: grafana_dashboard
+# grafana:
+#   enabled: true
+
+#   adminUser: admin
+#   adminPassword: "kyiQiGrkAlKB3YcuVF5BejFOStwjbyyvntW000oa"
+#   defaultDashboardsEnabled: false
+
+#   sidecar:
+#     dashboards:
+#       enabled: true
+#       label: grafana_dashboard
+#       folder: /tmp/dashboards
+
+#   dashboardProviders:
+#     dashboardproviders.yaml:
+#       apiVersion: 1
+#       providers:
+#         - name: default
+#           orgId: 1
+#           folder: ""
+#           type: file
+#           disableDeletion: false
+#           editable: true
+#           options:
+#             path: /tmp/dashboards
+
+#   dashboards:
+#     default:
+#       instance-metrics:
+#         json: |
+#           {
+#             "uid": "instance-metrics",
+#             "title": "Instance CPU / Memory / Disk",
+#             "schemaVersion": 38,
+#             "version": 1,
+#             "refresh": "30s",
+#             "timezone": "browser",
+#             "panels": [
+#               {
+#                 "type": "timeseries",
+#                 "title": "CPU Usage (%)",
+#                 "datasource": { "type": "prometheus", "uid": "prometheus" },
+#                 "targets": [
+#                   {
+#                     "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+#                     "legendFormat": "{{instance}}"
+#                   }
+#                 ],
+#                 "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+#               },
+#               {
+#                 "type": "timeseries",
+#                 "title": "Memory Usage (%)",
+#                 "datasource": { "type": "prometheus", "uid": "prometheus" },
+#                 "targets": [
+#                   {
+#                     "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+#                     "legendFormat": "{{instance}}"
+#                   }
+#                 ],
+#                 "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+#               },
+#               {
+#                 "type": "timeseries",
+#                 "title": "Disk Usage (%)",
+#                 "datasource": { "type": "prometheus", "uid": "prometheus" },
+#                 "targets": [
+#                   {
+#                     "expr": "(1 - (node_filesystem_avail_bytes{fstype!=\"tmpfs\"} / node_filesystem_size_bytes{fstype!=\"tmpfs\"})) * 100",
+#                     "legendFormat": "{{instance}} {{mountpoint}}"
+#                   }
+#                 ],
+#                 "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 }
+#               }
+#             ]
+#           }
+

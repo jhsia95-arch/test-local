@@ -1,9 +1,9 @@
-    1  minikube start
-    2  eval $(minikube docker-env)
-    3  docker build -t fastapi-demo:1.0 .
+minikube start
+eval $(minikube docker-env)
+docker build -t fastapi-demo:1.0 .
 update etc/host to 127.0.0.1 to service name api.local
 minikube tunnel
-   16  choco install kubernetes-helm
+choco install kubernetes-helm
 echo -n dbadmin
 echo -n 'V9!rQ2#Lx814124' | base64
 VjkhclEyI0x4OA==
@@ -32,23 +32,29 @@ VjkhclEyI0x4OA==
    41  curl -X POST "http://api.local/items?name=test"
    42  kubectl get svc -n ingress-nginx
    43  kubectl get pods -n ingress-nginx
-   47  minikube addons enable ingress
+minikube addons enable ingress
    48  minitunnel
    49  minikube tunnel
    50  kubectl get pods -n ingress-nginx
    51  curl -X POST "http://api.local/items?name=test"
 
    83  curl http://api.local/items
-   84  curl -X POST "http:://api.local/items?name=test"
+   84  curl -X POST "http://api.local/items?name=test"
    85  curl -X POST "http://api.local/items?name=test"
    86  curl http://api.local/items
+curl -X POST "http://api.local/items?name=TestItem"
+curl -X POST "http://api.local/items?name=TestItem"
+curl -X GET "http://api.local/items"
+curl -X DELETE "http://api.local/items/1"
+
 eval $(minikube -p minikube docker-env)    # Linux/Mac
 docker build -t fastapi-demo:1.0 .
 
   119  curl -X POST "http://api.local/webhook" -H "Content-Type: application/json" -d '{"event":"manual_test"}'
 
-  121  kubectl port-forward -n monitoring svc/kube-prom-grafana 3000:80
-  122  kubectl --namespace monitoring get secrets kube-prom-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+kubectl port-forward -n monitoring svc/kube-prom-grafana 3000:80
+  http://localhost:3000  
+  kubectl --namespace monitoring get secrets kube-prom-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
    24  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
    25  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
    26  helm repo update
@@ -57,3 +63,12 @@ docker build -t fastapi-demo:1.0 .
   125  helm upgrade --install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring -f helm/grafana-values.yaml
 
   133  kubectl port-forward -n monitoring svc/kube-prom-kube-prometheus-prometheus 9090:9090
+minikube stop
+minikube start \
+  --extra-config=kubelet.authentication-token-webhook=false \
+  --extra-config=kubelet.authorization-mode=AlwaysAllow \
+  --extra-config=kubelet.read-only-port=10255
+
+to check if metrics eposed
+kubectl port-forward -n default pod/fastapi-8594559996-m289r 8000:8000
+
