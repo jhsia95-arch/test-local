@@ -2,19 +2,97 @@ grafana:
   enabled: true
   adminUser: admin
   adminPassword: "kyiQiGrkAlKB3YcuVF5BejFOStwjbyyvntW000oa"
-  dashboards:
-    default:
-      k8s-pod-dashboard:
-        json: |
-          {
-            "annotations": {...},
-            "panels": [...],
-            "title": "K8s Pods Metrics"
-          }
+  defaultDashboardsEnabled: false  
+  # dashboards:
+  #   default:
+  #     fastAPI-dashboard:
+  #       json: |
+
   sidecar:
     dashboards:
       enabled: true
       label: grafana_dashboard
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://kube-prom-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+          isDefault: true
+          uid: prometheus
+          version: 1
+          editable: false  
+# kubeStateMetrics:
+#   enabled: true
+
+# nodeExporter:
+#   enabled: true
+
+# kubelet:
+#   serviceMonitor:
+#     enabled: true
+#     insecure: true          
+additionalPrometheusRulesMap:
+  fastapi-rules:
+    groups:
+      - name: fastapi.rules
+        rules:
+        - alert: FastAPIHighErrorRate
+          expr: |
+            sum(rate(http_requests_total{
+              status=~"4xx|5xx",
+              handler!="/metrics"
+            }[5m]))
+            /
+            sum(rate(http_requests_total{
+              handler!="/metrics"
+            }[5m]))
+            > 0.05
+          for: 5m
+          labels:
+            severity: warning
+        # CPU usage > 80%
+        - alert: HighCPUUsage
+          expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CPU usage is above 80% for 5 minutes"
+            description: "Instance {{ $labels.instance }} CPU is at {{ $value }}%"
+
+        # Memory usage > 80%
+        - alert: HighMemoryUsage
+          expr: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 80
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Memory usage is above 80% for 5 minutes"
+            description: "Instance {{ $labels.instance }} memory usage is at {{ $value }}%"
+
+        # Disk usage > 80%
+        - alert: HighDiskUsage
+          expr: 100 * (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|rootfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|rootfs"})) > 80
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Disk usage is above 80% for 1 minute"
+            description: "Instance {{ $labels.instance }} disk usage is at {{ $value }}%"
+        - alert: FastAPIHighLatency
+          expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High API latency on FastAPI"
+            description: "99th percentile latency is above 1s for 5 minutes on instance {{ $labels.instance }}."
+
+
+
 # grafana:
 #   enabled: true
 

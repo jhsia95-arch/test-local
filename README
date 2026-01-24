@@ -46,6 +46,7 @@ curl -X POST "http://api.local/items?name=TestItem"
 curl -X POST "http://api.local/items?name=TestItem"
 curl -X GET "http://api.local/items"
 curl -X DELETE "http://api.local/items/1"
+curl -X PUT "http://api.local/items/2?name=UpdatedItem&price=30.0"
 
 eval $(minikube -p minikube docker-env)    # Linux/Mac
 docker build -t fastapi-demo:1.0 .
@@ -71,4 +72,9 @@ minikube start \
 
 to check if metrics eposed
 kubectl port-forward -n default pod/fastapi-8594559996-m289r 8000:8000
+
+100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
+100 * (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|rootfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|rootfs"}))
+
 
