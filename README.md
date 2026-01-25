@@ -1,5 +1,6 @@
 # PREREQUISITE
 Download minikube
+Install kubectl
 Download Docker desktop
 Enable virtualisation if you are using local computer to directly run minikube
 ## Install helm using choco
@@ -16,79 +17,49 @@ minikube addons enable ingress
 eval $(minikube docker-env)
 docker build -t fastapi-demo:1.0 .
 
-## Deploy using helm
+## Deploy db using helm
+helm install db helm/postgres/
+
+## Deploy webapp using helm
 helm install webapp helm/appcharts/
 
-update etc/host to 127.0.0.1 to service name api.local
-minikube tunnel
-choco install kubernetes-helm
+## Deploy grafana
+kubectl apply -f grafana-configmap.yaml
+kubectl apply -f servicemonitor.yaml
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm install kube-prom prometheus-community/kube-prometheus-stack \
+  -n monitoring \
+  --create-namespace \
+  -f grafana-values.yaml
 
-   18  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-   19  helm repo add grafana https://grafana.github.io/helm-charts
-   20  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
-
-   23  minikube start --cpus=4 --memory=6g
-   24  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
-   25  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-   26  helm repo update
-   27  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring   --create-namespace   --set grafana.enabled=true   --set alertmanager.enabled=true   --set prometheus.prometheusSpec.retention=2d
-   28  kubectl get svc -n monitoring | grep prometheus
-   29  kubectl apply -f k8s/postgres/
-   30  kubectl apply -f k8s/app/
-   31  curl -X POST "http://api.local/items?name=test"
-   32  curl http://api.local/items
-   33  history
-   34  curl -X POST "http://192.168.49.2/items?name=test"
-   35  kubectl get ingress
-   36  curl -X POST "http://api.local/items?name=test"
-   37  kubectl get nodes
-   38  kubectl  get pods -A
-   39  kubectl  get pods -Ao wide
-   40  minikube ip
-   41  curl -X POST "http://api.local/items?name=test"
-   42  kubectl get svc -n ingress-nginx
-   43  kubectl get pods -n ingress-nginx
-minikube addons enable ingress
-   48  minitunnel
-   49  minikube tunnel
-   50  kubectl get pods -n ingress-nginx
-   51  curl -X POST "http://api.local/items?name=test"
-
-   83  curl http://api.local/items
-   84  curl -X POST "http://api.local/items?name=test"
-   85  curl -X POST "http://api.local/items?name=test"
-   86  curl http://api.local/items
-curl -X POST "http://api.local/items?name=TestItem"
-curl -X POST "http://api.local/items?name=TestItem"
+# Test app
+Update local hostfile under C:\Windows\System32\drivers\etc\hosts add in a record for "127.0.0.1 api.local"
+Open a browser and go to this link to monitor webhook updates https://webhook.site/#!/view/30cc039a-3e58-4e74-83f9-4860406ff233/a71f7c13-2ea3-4f2e-97cc-57832be70f05/1
+Open another terminal and run command minikube tunnel
+## API calls
+curl -X POST "http://api.local/items?name=test"
 curl -X GET "http://api.local/items"
-curl -X DELETE "http://api.local/items/2"
-curl -X PUT "http://api.local/items/2?name=UpdatedItem&price=30.0"
+curl -X PUT "http://api.local/items/1?name=updated"
+curl -X DELETE "http://api.local/items/1"
+
+you should be able to see the records as you enter these curl commands
+Go back to the webhook page on your browser and you should see the POST requests
 
 
-  119  curl -X POST "http://api.local/webhook" -H "Content-Type: application/json" -d '{"event":"manual_test"}'
+# Test grafana dashboard
+## Get grafana password for log in page
+kubectl --namespace monitoring get secrets kube-prom-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo 
 
+## set up port forwarding to grafana dashboard
 kubectl port-forward -n monitoring svc/kube-prom-grafana 3000:80
-  http://localhost:3000  
-  kubectl --namespace monitoring get secrets kube-prom-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
-   24  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
-   25  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-   26  helm repo update
-   27  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring   --create-namespace   --set grafana.enabled=true   --set alertmanager.enabled=true   --set prometheus.prometheusSpec.retention=2d
-
-  125  helm upgrade --install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring -f helm/grafana-values.yaml
-
-  133  kubectl port-forward -n monitoring svc/kube-prom-kube-prometheus-prometheus 9090:9090
-minikube stop
-minikube start \
-  --extra-config=kubelet.authentication-token-webhook=false \
-  --extra-config=kubelet.authorization-mode=AlwaysAllow \
-  --extra-config=kubelet.read-only-port=10255
-
-to check if metrics eposed
-kubectl port-forward -n default pod/fastapi-8594559996-m289r 8000:8000
-
-100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
-100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
-100 * (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|rootfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|rootfs"}))
+## Open browser enter URL
+http://localhost:3000
 
 
+# Test prometheus alerts
+## set up port forwarding to prometheus
+kubectl port-forward -n monitoring svc/kube-prom-kube-prometheus-prometheus 9090:9090
+## Open browser enter URL
+http://localhost:9090
+Go to Alerts tab, scroll to fastapi.rules and there you can see the prometheus rules threshold set
