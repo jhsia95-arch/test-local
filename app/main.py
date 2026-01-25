@@ -1,12 +1,9 @@
 from fastapi import FastAPI, Request, Depends
 from sqlalchemy.orm import Session
-# from database import SessionLocal, engine, Base
-# from models import Item
 from app.database import SessionLocal, engine, Base
 from app.models import Item
 import httpx
 from fastapi import HTTPException
-# Base.metadata.create_all(bind=engine)
 from contextlib import asynccontextmanager
 ##
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -19,11 +16,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# app = FastAPI()
-
-# @app.on_event("startup")
-# def startup():
-#     Base.metadata.create_all(bind=engine)
 
 # Dependency to get DB session
 def get_db():
