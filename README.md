@@ -1,12 +1,28 @@
+# PREREQUISITE
+Download minikube
+Download Docker desktop
+Enable virtualisation if you are using local computer to directly run minikube
+## Install helm using choco
+choco install kubernetes-helm
+
+# DEPLOYING RESOURCE
+## Deploying kubernetes
 minikube start
+
+## Enable ingress
+minikube addons enable ingress
+
+## Build docker image locally
 eval $(minikube docker-env)
 docker build -t fastapi-demo:1.0 .
+
+## Deploy using helm
+helm install webapp helm/appcharts/
+
 update etc/host to 127.0.0.1 to service name api.local
 minikube tunnel
 choco install kubernetes-helm
-echo -n dbadmin
-echo -n 'V9!rQ2#Lx814124' | base64
-VjkhclEyI0x4OA==
+
    18  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
    19  helm repo add grafana https://grafana.github.io/helm-charts
    20  helm install kube-prom prometheus-community/kube-prometheus-stack   -n monitoring --create-namespace
@@ -45,11 +61,9 @@ minikube addons enable ingress
 curl -X POST "http://api.local/items?name=TestItem"
 curl -X POST "http://api.local/items?name=TestItem"
 curl -X GET "http://api.local/items"
-curl -X DELETE "http://api.local/items/1"
+curl -X DELETE "http://api.local/items/2"
 curl -X PUT "http://api.local/items/2?name=UpdatedItem&price=30.0"
 
-eval $(minikube -p minikube docker-env)    # Linux/Mac
-docker build -t fastapi-demo:1.0 .
 
   119  curl -X POST "http://api.local/webhook" -H "Content-Type: application/json" -d '{"event":"manual_test"}'
 

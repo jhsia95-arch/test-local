@@ -23,17 +23,7 @@ grafana:
           isDefault: true
           uid: prometheus
           version: 1
-          editable: false  
-# kubeStateMetrics:
-#   enabled: true
-
-# nodeExporter:
-#   enabled: true
-
-# kubelet:
-#   serviceMonitor:
-#     enabled: true
-#     insecure: true          
+          editable: false       
 additionalPrometheusRulesMap:
   fastapi-rules:
     groups:
