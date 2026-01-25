@@ -75,6 +75,9 @@ kubectl port-forward -n monitoring svc/kube-prom-grafana 3000:80
 ## Open browser enter URL
 http://localhost:3000
 
+log in to console
+username: admin
+password: <from above step>
 
 # Test prometheus alerts
 ## set up port forwarding to prometheus
