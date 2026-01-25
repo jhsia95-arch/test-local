@@ -12,10 +12,10 @@ spec:
       labels:
         app: fastapi
     spec:
-      serviceAccountName: fastapi-sa    
+      # serviceAccountName: fastapi-sa    
       containers:
         - name: fastapi
-          image: {{ .Values.appimage}}:{{ .Values.apptag}} #fastapi-demo:1.0
+          image: fastapi-demo:1.0 
           # imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

@@ -1,7 +1,7 @@
 grafana:
   enabled: true
-  adminUser: admin
-  adminPassword: "kyiQiGrkAlKB3YcuVF5BejFOStwjbyyvntW000oa"
+  # adminUser: admin
+  # adminPassword: "kyiQiGrkAlKB3YcuVF5BejFOStwjbyyvntW000oa"
   defaultDashboardsEnabled: false  
   # dashboards:
   #   default:
@@ -20,7 +20,7 @@ grafana:
           type: prometheus
           access: proxy
           url: http://kube-prom-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
-          isDefault: true
+          isDefault: false
           uid: prometheus
           version: 1
           editable: false       
