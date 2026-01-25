@@ -1,3 +1,12 @@
+# Deploy local
+This series of steps will include:
+
+1. set up minikube on your local machine
+
+2. deploy fastapi app, db and grafana,prometheus into the minikube
+
+3. testing of the app and monitoring
+
 # PREREQUISITE
 Download minikube
 
