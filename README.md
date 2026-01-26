@@ -54,7 +54,7 @@ helm install kube-prom prometheus-community/kube-prometheus-stack \
 # Test app
 Update local hostfile under C:\Windows\System32\drivers\etc\hosts add in a record for "127.0.0.1 api.local"
 
-Open a browser and go to this link to monitor webhook updates https://webhook.site/#!/view/30cc039a-3e58-4e74-83f9-4860406ff233/a71f7c13-2ea3-4f2e-97cc-57832be70f05/1
+Open a browser and go to this link to monitor webhook updates https://webhook.site/#!/view/ebfb63af-9a95-4c79-9560-18ad320f08be/445dad5d-94bb-41b8-b3ba-0f229e8a64ee/1
 
 Open another terminal and run command minikube tunnel
 
